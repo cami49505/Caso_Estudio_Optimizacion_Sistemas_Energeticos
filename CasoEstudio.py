@@ -1,4 +1,4 @@
-#CASO DE ESTUDIO
+# CASO DE ESTUDIO - SISTEMAS ENERGÉTICOS 25
 !pip install -q pulp
 !pip install matplotlib
 import pulp
@@ -243,3 +243,88 @@ plt.grid(True, axis='x', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 
+
+print("\n--- RESULTADOS DE LAS VARIABLES ---\n")
+
+# Paneles solares por tipo y punto
+print("Paneles solares:")
+for p in range(P):
+    for s in range(S):
+        val = pulp.value(xs[p][s])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {s}")
+
+# Controladores de panel
+print("\nControladores de panel:")
+for p in range(P):
+    for z in range(Z):
+        val = pulp.value(xz[p][z])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {z}")
+
+# Turbinas
+print("\nTurbinas:")
+for p in range(P):
+    for a in range(A):
+        val = pulp.value(xa[p][a])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {a}")
+
+# Controladores de turbina
+print("\nControladores de turbina:")
+for p in range(P):
+    for r in range(R):
+        val = pulp.value(xr[p][r])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {r}")
+
+# Baterías
+print("\nBaterías:")
+for p in range(P):
+    for b in range(B):
+        val = pulp.value(xb[p][b])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {b}")
+
+# Inversores
+print("\nInversores:")
+for p in range(P):
+    for i in range(I):
+        val = pulp.value(xi[p][i])
+        if val > 0:
+            print(f"  Punto {p}: {int(val)} unidades del tipo {i}")
+
+# Generadores activados
+print("\nGeneradores activos:")
+for p in range(P):
+    if pulp.value(xg[p]) > 0.5:
+        print(f"  Punto {p}: Activado")
+
+# Medidores instalados
+print("\nMedidores instalados:")
+for p in range(P):
+    if pulp.value(xm[p]) > 0.5:
+        print(f"  Punto {p}: Instalado")
+
+# Conexiones activas
+print("\nConexiones (líneas eléctricas) activas:")
+for p in range(P):
+    for d in range(P):
+        if p != d and pulp.value(xc[p][d]) > 0.5:
+            print(f"  Línea activa: {p} -> {d}")
+
+# Flujo de energía
+print("\nFlujo de energía:")
+for p in range(P):
+    for d in range(P):
+        if p != d and pulp.value(fe[p][d]) > 0.01:
+            print(f"  {p} -> {d}: {pulp.value(fe[p][d]):.2f} Wh")
+
+# Flujo de potencia
+print("\nFlujo de potencia:")
+for p in range(P):
+    for d in range(P):
+        if p != d and pulp.value(fp[p][d]) > 0.01:
+            print(f"  {p} -> {d}: {pulp.value(fp[p][d]):.2f} W")
+
+print(f"\nCosto total mínimo: {model.objective.value():,.2f} $")
